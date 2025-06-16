@@ -1,0 +1,54 @@
+@startuml Code_ClienteController
+' Usar skinparam para um visual mais limpo, similar ao C4 se desejado
+' skinparam defaultTextAlignment center
+' skinparam shadowing false
+' skinparam roundcorner 10
+' skinparam monochrome true
+' skinparam classAttributeIconSize 0
+
+title Diagrama de Código (Nível 4) - Detalhes do ClienteController
+
+package com.example.api.controller {
+  class ClienteController {
+    - clienteService: ClienteService
+    + listarTodos(): List<Cliente>
+    + buscarPorId(id: Long): ResponseEntity<Cliente>
+    + buscarPorNome(nome: String): List<Cliente>
+    + salvar(cliente: Cliente): ResponseEntity<Cliente>
+    + atualizar(id: Long, cliente: Cliente): ResponseEntity<Cliente>
+    + deletar(id: Long): ResponseEntity<Void>
+    + contarClientes(): ResponseEntity<Long>
+  }
+}
+
+package com.example.api.service {
+  interface ClienteService {
+    + listarTodos(): List<Cliente>
+    + buscarPorId(id: Long): Optional<Cliente>
+    + buscarPorNome(nome: String): List<Cliente>
+    + salvar(cliente: Cliente): Cliente
+    + atualizar(id: Long, clienteAtualizado: Cliente): Optional<Cliente>
+    + deletar(id: Long): void
+    + contarClientes(): long
+  }
+}
+
+package com.example.api.model {
+  class Cliente {
+    - id: Long
+    - nome: String
+    - email: String
+  }
+}
+
+package org.springframework.http {
+  class ResponseEntity<T> {
+    ' Métodos estáticos e construtores relevantes
+  }
+}
+
+ClienteController --> ClienteService : depende de
+ClienteController ..> Cliente : usa como parâmetro/retorno
+ClienteController ..> ResponseEntity : usa para encapsular respostas HTTP
+
+@enduml

@@ -1,0 +1,11 @@
+@startuml SystemContext_ClienteAPI
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title Diagrama de Contexto do Sistema - API de Clientes
+
+Person(user, "Usuário da API", "Ex: Desenvolvedor, Sistema Frontend, Outra Aplicação")
+System(cliente_api, "API de Clientes", "Fornece funcionalidades para gerenciar informações de clientes.")
+
+Rel(user, cliente_api, "Usa para consultar e gerenciar clientes", "HTTP/JSON")
+
+@enduml

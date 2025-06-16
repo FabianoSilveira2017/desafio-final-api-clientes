@@ -1,0 +1,16 @@
+@startuml Container_ClienteAPI
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Diagrama de Contêineres - API de Clientes
+
+Person_Ext(user, "Usuário da API", "Ex: Desenvolvedor, Sistema Frontend")
+
+System_Boundary(api_boundary, "Sistema API de Clientes") {
+    Container(spring_app, "Aplicação API de Clientes", "Java, Spring Boot", "Expõe uma API RESTful para operações de CRUD de clientes.")
+    ContainerDb(database, "Banco de Dados de Clientes", "Relacional (ex: H2, PostgreSQL, MySQL)", "Armazena informações dos clientes (nomes, emails, etc).")
+}
+
+Rel(user, spring_app, "Envia requisições para", "HTTP/JSON")
+Rel(spring_app, database, "Lê e escreve dados dos clientes", "JDBC/SQL")
+
+@enduml

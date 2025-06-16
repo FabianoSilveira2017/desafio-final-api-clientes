@@ -1,0 +1,33 @@
+@startuml Component_ClienteAPI_App
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Diagrama de Componentes - Aplicação API de Clientes
+
+' Elementos externos para referência
+Person_Ext(user, "Usuário da API")
+ContainerDb_Ext(database, "Banco de Dados de Clientes")
+
+Container_Boundary(app_boundary, "Aplicação API de Clientes") {
+    Component(cliente_controller, "ClienteController", "Spring MVC RestController", "Recebe requisições HTTP, valida entradas, e delega para o ClienteService.")
+    Component(cliente_service, "ClienteService", "Spring Service Component", "Contém a lógica de negócios para o gerenciamento de clientes.")
+    Component(cliente_repository, "ClienteRepository", "Spring Data JPA Interface", "Abstrai o acesso e a persistência dos dados do cliente no banco de dados.")
+
+    ' Opcional: Mostrar componentes do framework se ajudar na clareza
+    Component(spring_mvc, "Spring MVC Framework", "Framework", "Lida com roteamento de requisições web, data binding, serialização/deserialização JSON.")
+    Component(spring_data_jpa, "Spring Data JPA", "Framework", "Facilita a implementação de camadas de acesso a dados JPA e interage com o provedor JPA (ex: Hibernate).")
+
+    Rel(cliente_controller, cliente_service, "Usa", "Java API")
+    Rel(cliente_service, cliente_repository, "Usa", "Java API")
+
+    ' Relações com componentes do framework (implícitas ou explícitas)
+    Rel(cliente_controller, spring_mvc, "É gerenciado e usa funcionalidades do")
+    Rel(cliente_repository, spring_data_jpa, "É uma interface gerenciada e implementada por")
+}
+
+' Interações de fora para dentro do contêiner
+Rel(user, cliente_controller, "Envia requisições para", "HTTP/JSON")
+
+' Interações de dentro do contêiner para fora (para o banco de dados)
+Rel(cliente_repository, database, "Lê/Escreve usando", "JDBC/SQL (via Spring Data JPA/Hibernate)")
+
+@enduml

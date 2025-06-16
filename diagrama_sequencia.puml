@@ -1,0 +1,33 @@
+@startuml SalvarClienteSequence
+title Diagrama de Sequência - Salvar Novo Cliente
+
+actor "Usuário da API" as User
+participant "ClienteController" as Controller
+participant "ClienteService" as Service
+participant "ClienteRepository" as Repository
+database "Banco de Dados" as DB
+
+User -> Controller: POST /clientes\n(JSON com dados do Cliente)
+activate Controller
+
+Controller -> Service: salvar(cliente: Cliente)
+activate Service
+
+Service -> Repository: save(cliente: Cliente)
+activate Repository
+
+Repository -> DB: INSERT INTO cliente (nome, email) VALUES (...)
+activate DB
+DB --> Repository: Cliente com ID gerado
+deactivate DB
+
+Repository --> Service: Cliente salvo (com ID)
+deactivate Repository
+
+Service --> Controller: Cliente salvo (com ID)
+deactivate Service
+
+Controller --> User: HTTP 201 Created\n(JSON com Cliente salvo)
+deactivate Controller
+
+@enduml
