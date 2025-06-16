@@ -1,0 +1,49 @@
+@startuml AtualizarClienteSequence
+title Diagrama de Sequência - Atualizar Cliente Existente
+
+actor "Usuário da API" as User
+participant "ClienteController" as Controller
+participant "ClienteService" as Service
+participant "ClienteRepository" as Repository
+database "Banco de Dados" as DB
+
+User -> Controller: PUT /clientes/{id}\n(JSON com dados atualizados do Cliente)
+activate Controller
+
+Controller -> Service: atualizar(id: Long, clienteAtualizado: Cliente)
+activate Service
+
+' Opcional, mas comum: Service verifica se o cliente existe primeiro
+Service -> Repository: findById(id: Long)
+activate Repository
+Repository -> DB: SELECT * FROM cliente WHERE id = {id}
+activate DB
+DB --> Repository: Cliente existente (ou nulo)
+deactivate DB
+Repository --> Service: Optional<Cliente> (contendo o cliente ou vazio)
+deactivate Repository
+
+alt Cliente Encontrado
+    Service -> Service: Atualiza os campos do cliente existente \ncom dados de 'clienteAtualizado'
+    Service -> Repository: save(clienteExistenteAtualizado: Cliente)
+    activate Repository
+    Repository -> DB: UPDATE cliente SET nome=?, email=? WHERE id=?
+    activate DB
+    DB --> Repository: Confirmação da atualização
+    deactivate DB
+    Repository --> Service: Cliente atualizado
+    deactivate Repository
+
+    Service --> Controller: Cliente atualizado
+    deactivate Service
+
+    Controller --> User: HTTP 200 OK\n(JSON com Cliente atualizado)
+else Cliente Não Encontrado
+    Service --> Controller: Erro/Exceção (Cliente não encontrado)
+    deactivate Service
+    Controller --> User: HTTP 404 Not Found
+end
+
+deactivate Controller
+
+@enduml
