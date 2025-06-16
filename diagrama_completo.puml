@@ -1,0 +1,87 @@
+@startuml
+' Configurações para deixar o diagrama mais limpo
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide empty members
+title Diagrama de Classes do Projeto API Clientes
+
+package model {
+  class Cliente {
+    - id: Long
+    - nome: String
+    - email: String
+    + getId(): Long
+    + getNome(): String
+    + getEmail(): String
+    + setNome(String nome): void
+    + setEmail(String email): void
+    ' Construtores e outros métodos se houver
+  }
+}
+
+package repository {
+  interface JpaRepository<T, ID> {
+    + findAll(): List<T>
+    + findById(ID id): Optional<T>
+    + save(T entity): T
+    + deleteById(ID id): void
+    + count(): long
+    ' ... outros métodos CRUD
+  }
+
+  interface ClienteRepository extends JpaRepository<Cliente, Long> {
+    + findByNomeContainingIgnoreCase(String nome): List<Cliente>
+    ' Outros métodos de consulta personalizados
+  }
+}
+
+package service {
+  class ClienteService {
+    - clienteRepository: ClienteRepository
+    + listarTodos(): List<Cliente>
+    + buscarPorId(Long id): Optional<Cliente>
+    + buscarPorNome(String nome): List<Cliente>
+    + salvar(Cliente cliente): Cliente
+    + atualizar(Long id, Cliente clienteAtualizado): Optional<Cliente>
+    + deletar(Long id): void
+    + contarClientes(): long
+  }
+}
+
+package controller {
+  class ClienteController {
+    - clienteService: ClienteService
+    + listarTodos(): List<Cliente>
+    + buscarPorId(Long id): ResponseEntity<Cliente>
+    + buscarPorNome(String nome): List<Cliente>
+    + salvar(@RequestBody Cliente cliente): ResponseEntity<Cliente>
+    + atualizar(@PathVariable Long id, @RequestBody Cliente cliente): ResponseEntity<Cliente>
+    + deletar(@PathVariable Long id): ResponseEntity<Void>
+    + contarClientes(): ResponseEntity<Long>
+  }
+}
+
+package com {
+  package example {
+    package api {
+      class ApiApplication {
+        + static main(String[] args): void
+      }
+    }
+  }
+}
+
+' Relacionamentos
+ClienteController --> ClienteService : usa
+ClienteService --> ClienteRepository : usa
+
+ClienteController ..> Cliente : manipula/retorna
+ClienteService ..> Cliente : manipula/retorna
+ClienteRepository ..> Cliente : gerencia
+
+ApiApplication .[dashed].> ClienteController : (gerenciado por Spring)
+ApiApplication .[dashed].> ClienteService : (gerenciado por Spring)
+ApiApplication .[dashed].> ClienteRepository : (gerenciado por Spring)
+
+
+@enduml
