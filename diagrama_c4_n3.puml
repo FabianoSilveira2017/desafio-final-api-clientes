@@ -4,7 +4,7 @@
 title Diagrama de Componentes - API de Clientes
 
 ' Elementos externos para referência
-Person_Ext(user, "Usuário da API")
+Person(user, "Usuário da API")
 ContainerDb_Ext(database, "Banco de Dados de Clientes")
 
 Container_Boundary(app_boundary, "Aplicação API de Clientes") {

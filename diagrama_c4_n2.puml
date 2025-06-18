@@ -3,7 +3,7 @@
 
 title Diagrama de Contêineres - API de Clientes
 
-Person_Ext(user, "Usuário da API", "Ex: Desenvolvedor, Sistema Frontend")
+Person(user, "Usuário da API", "Ex: Desenvolvedor, Sistema Frontend")
 
 System_Boundary(api_boundary, "Sistema API de Clientes") {
     Container(spring_app, "Aplicação API de Clientes", "Java, Spring Boot", "Expõe uma API RESTful para operações de CRUD de clientes.")
