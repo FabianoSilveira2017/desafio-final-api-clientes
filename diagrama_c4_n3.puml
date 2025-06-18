@@ -1,7 +1,7 @@
 @startuml Component_ClienteAPI_App
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
 
-title Diagrama de Componentes - Aplicação API de Clientes
+title Diagrama de Componentes - API de Clientes
 
 ' Elementos externos para referência
 Person_Ext(user, "Usuário da API")

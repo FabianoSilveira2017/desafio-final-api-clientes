@@ -6,9 +6,9 @@
 ' skinparam monochrome true
 ' skinparam classAttributeIconSize 0
 
-title Diagrama de Código (Nível 4) - Detalhes do ClienteController
+title Diagrama de Código - API de Clientes
 
-package com.example.api.controller {
+package br.com.loja.api.controller {
   class ClienteController {
     - clienteService: ClienteService
     + listarTodos(): List<Cliente>
@@ -21,7 +21,7 @@ package com.example.api.controller {
   }
 }
 
-package com.example.api.service {
+package br.com.loja.api.service {
   interface ClienteService {
     + listarTodos(): List<Cliente>
     + buscarPorId(id: Long): Optional<Cliente>
@@ -33,7 +33,7 @@ package com.example.api.service {
   }
 }
 
-package com.example.api.model {
+package br.com.loja.api.model {
   class Cliente {
     - id: Long
     - nome: String

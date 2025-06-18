@@ -7,7 +7,7 @@ participant "ClienteService" as Service
 participant "ClienteRepository" as Repository
 database "Banco de Dados" as DB
 
-User -> Controller: POST /clientes\n(JSON com dados do Cliente)
+User -> Controller: POST /v1/clientes\n(JSON com dados do Cliente)
 activate Controller
 
 Controller -> Service: salvar(cliente: Cliente)

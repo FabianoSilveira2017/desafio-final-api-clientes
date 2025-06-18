@@ -3,7 +3,7 @@
 skinparam classAttributeIconSize 0
 skinparam linetype ortho
 hide empty members
-title Diagrama de Classes do Projeto API Clientes
+title Diagrama de Classes - API Clientes
 
 package model {
   class Cliente {
@@ -61,11 +61,13 @@ package controller {
   }
 }
 
-package com {
-  package example {
-    package api {
-      class ApiApplication {
-        + static main(String[] args): void
+package br {
+  package com {
+    package loja {
+      package api {
+        class LojaApplication {
+          + static main(String[] args): void
+        }
       }
     }
   }
@@ -79,9 +81,8 @@ ClienteController ..> Cliente : manipula/retorna
 ClienteService ..> Cliente : manipula/retorna
 ClienteRepository ..> Cliente : gerencia
 
-ApiApplication .[dashed].> ClienteController : (gerenciado por Spring)
-ApiApplication .[dashed].> ClienteService : (gerenciado por Spring)
-ApiApplication .[dashed].> ClienteRepository : (gerenciado por Spring)
-
+LojaApplication .[dashed].> ClienteController : (gerenciado por Spring)
+LojaApplication .[dashed].> ClienteService : (gerenciado por Spring)
+LojaApplication .[dashed].> ClienteRepository : (gerenciado por Spring)
 
 @enduml

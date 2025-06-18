@@ -1,7 +1,7 @@
-package com.example.api.controller;
+package br.com.loja.api.controller;
 
-import com.example.api.model.Cliente;
-import com.example.api.service.ClienteService;
+import br.com.loja.api.model.Cliente;
+import br.com.loja.api.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/clientes")
+@RequestMapping("/v1/clientes")
 public class ClienteController {
     @Autowired
     private ClienteService clienteService;

@@ -7,7 +7,7 @@ participant "ClienteService" as Service
 participant "ClienteRepository" as Repository
 database "Banco de Dados" as DB
 
-User -> Controller: PUT /clientes/{id}\n(JSON com dados atualizados do Cliente)
+User -> Controller: PUT /v1/clientes/{id}\n(JSON com dados atualizados do Cliente)
 activate Controller
 
 Controller -> Service: atualizar(id: Long, clienteAtualizado: Cliente)

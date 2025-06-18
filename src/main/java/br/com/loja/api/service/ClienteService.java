@@ -1,7 +1,7 @@
-package com.example.api.service;
+package br.com.loja.api.service;
 
-import com.example.api.model.Cliente;
-import com.example.api.repository.ClienteRepository;
+import br.com.loja.api.model.Cliente;
+import br.com.loja.api.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
