@@ -1,0 +1,91 @@
+@startuml
+!include C:/Users/corre/Downloads/aws-icons-for-plantuml-main/aws-icons-for-plantuml-main/dist/AWSCommon.puml
+!include C:/Users/corre/Downloads/aws-icons-for-plantuml-main/aws-icons-for-plantuml-main/dist/Compute/EC2.puml
+!include C:/Users/corre/Downloads/aws-icons-for-plantuml-main/aws-icons-for-plantuml-main/dist/Compute/EC2AutoScaling.puml
+!include C:/Users/corre/Downloads/aws-icons-for-plantuml-main/aws-icons-for-plantuml-main/dist/Database/RDS.puml
+!include C:/Users/corre/Downloads/aws-icons-for-plantuml-main/aws-icons-for-plantuml-main/dist/Groups/VPC.puml
+!include C:/Users/corre/Downloads/aws-icons-for-plantuml-main/aws-icons-for-plantuml-main/dist/Groups/AvailabilityZone.puml
+!include C:/Users/corre/Downloads/aws-icons-for-plantuml-main/aws-icons-for-plantuml-main/dist/Groups/PublicSubnet.puml
+!include C:/Users/corre/Downloads/aws-icons-for-plantuml-main/aws-icons-for-plantuml-main/dist/Groups/PrivateSubnet.puml
+!include C:/Users/corre/Downloads/aws-icons-for-plantuml-main/aws-icons-for-plantuml-main/dist/NetworkingContentDelivery/ElasticLoadBalancing.puml
+!include C:/Users/corre/Downloads/aws-icons-for-plantuml-main/aws-icons-for-plantuml-main/dist/NetworkingContentDelivery/DirectConnectGateway.puml
+!include C:/Users/corre/Downloads/aws-icons-for-plantuml-main/aws-icons-for-plantuml-main/dist/NetworkingContentDelivery/Route53RouteTable.puml
+!include C:/Users/corre/Downloads/aws-icons-for-plantuml-main/aws-icons-for-plantuml-main/dist/SecurityIdentityCompliance/IdentityAccessManagementRole.puml
+!include C:/Users/corre/Downloads/aws-icons-for-plantuml-main/aws-icons-for-plantuml-main/dist/General/User.puml
+
+' Configurações de layout
+left to right direction
+skinparam rectangle<<group>> {
+    BorderColor #232F3E
+    BackgroundColor #FFFFFF
+}
+skinparam rectangle<<frame>> {
+    BorderColor #232F3E
+    BackgroundColor #F2F2F2
+}
+
+' Título
+title Arquitetura de Solução em Nuvem AWS
+
+' Elementos externos
+User(user, "Usuário", "Acessa a aplicação via HTTPS")
+DirectConnectGateway(igw, "Internet Gateway", "")
+
+' Início da VPC
+VPCGroup(vpc, "VPC") {
+
+    ' Roteamento
+    Route53RouteTable(rt_public, "Tabela de Rota Pública", "")
+    igw <--> rt_public
+
+    ' Zona de Disponibilidade 1
+    AvailabilityZoneGroup(az1, "Availability Zone 1") {
+        PublicSubnetGroup(pub1, "Subnet Pública") {
+            ElasticLoadBalancing(alb, "Application Load Balancer", "Escalável e altamente disponível")
+        }
+        PrivateSubnetGroup(priv1, "Subnet Privada") {
+            EC2AutoScaling(asg, "Auto Scaling Group", "Min: 3, Max: 6 instâncias")
+            EC2(ec2_1, "Instância EC2", "Linux, Web/App Server")
+            RDS(rds_master, "RDS (Master)", "Instância primária do banco de dados")
+        }
+    }
+
+    ' Zona de Disponibilidade 2
+    AvailabilityZoneGroup(az2, "Availability Zone 2") {
+        PublicSubnetGroup(pub2, "Subnet Pública") {
+            ' O ALB se estende por múltiplas AZs
+        }
+        PrivateSubnetGroup(priv2, "Subnet Privada") {
+            EC2(ec2_2, "Instância EC2", "Linux, Web/App Server")
+            EC2(ec2_3, "Instância EC2", "Linux, Web/App Server")
+            RDS(rds_slave, "RDS (Slave)", "Réplica para alta disponibilidade")
+        }
+    }
+
+    ' IAM Role
+    IdentityAccessManagementRole(iam, "IAM Role para EC2", "Permissões de Leitura/Escrita no RDS")
+}
+
+' Relacionamentos
+user --> igw
+igw --> alb
+
+alb --> ec2_1
+alb --> ec2_2
+alb --> ec2_3
+
+asg --> ec2_1
+asg --> ec2_2
+asg --> ec2_3
+
+ec2_1 ..> iam
+ec2_2 ..> iam
+ec2_3 ..> iam
+
+ec2_1 --> rds_master
+ec2_2 --> rds_master
+ec2_3 --> rds_master
+
+rds_master <--> rds_slave
+
+@enduml
