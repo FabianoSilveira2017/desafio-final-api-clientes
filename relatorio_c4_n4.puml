@@ -1,0 +1,35 @@
+@startuml C4_Codigo_NotificationService
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+
+' Componentes/Classes Externas (outros componentes do L3)
+Component(consumer, "PubSubConsumer", "Componente")
+
+' Interfaces (Portas) para os adaptadores externos
+Component(ft_port, "IFeatureToggleClient", "Interface (Port)")
+Component(cadastro_port, "ICadastroClienteClient", "Interface (Port)")
+Component(crm_port, "ICRMClient", "Interface (Port)")
+Component(atomico_port, "IAtomicoClient", "Interface (Port)")
+
+' DTOs (Data Transfer Objects)
+Component(dto_in, "ParcelaPagaDTO", "Classe (DTO)", "Dados da mensagem recebida")
+Component(dto_out_crm, "CRMRequestDTO", "Classe (DTO)", "Payload para o CRM")
+Component(dto_out_atomico, "EstadoNotificacaoDTO", "Classe (DTO)", "Payload para o Atômico")
+
+' Relações
+' O Consumer depende da Interface do Serviço
+Rel(consumer, service_iface, "Chama", "processar(dto)")
+
+' A Implementação do Serviço depende das Interfaces (Portas)
+Rel(service_impl, ft_port, "Depende de", "->")
+Rel(service_impl, cadastro_port, "Depende de", "->")
+Rel(service_impl, crm_port, "Depende de", "->")
+Rel(service_impl, atomico_port, "Depende de", "->")
+
+' A Implementação do Serviço usa os DTOs
+Rel(service_impl, dto_in, "Usa", "..>")
+Rel(service_impl, dto_out_crm, "Cria", "..>")
+Rel(service_impl, dto_out_atomico, "Cria", "..>")
+
+@enduml

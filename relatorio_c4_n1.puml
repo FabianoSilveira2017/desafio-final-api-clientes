@@ -1,0 +1,32 @@
+@startuml C4_Contexto
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+LAYOUT_WITH_LEGEND()
+
+' Atores
+Person(cliente, "Cliente", "Cliente do 'Banco Azul' que possui financiamento.")
+Person(marketing, "Time de Marketing", "Equipe interna que analisa a efetividade das notificações.")
+
+' Sistema em Foco
+System(notificacao, "Sistema de Notificação de Pagamentos", "Sistema responsável por processar e solicitar o envio de notificações de pagamentos de parcelas.")
+
+' Sistemas Externos
+System_Ext(app_cliente, "Aplicativo do Banco", "App mobile onde o cliente recebe a notificação push.")
+System_Ext(recebimentos, "Sistema de Recebimentos (Legado)", "Sistema legado que processa os pagamentos. Fornece dados via base analítica replicada.")
+System_Ext(crm, "Building Block (CRM)", "Sistema existente responsável pelo envio de notificações push e pelo dashboard de acompanhamento.")
+System_Ext(cadastro_clientes, "Cadastro de Clientes", "Sistema externo que fornece dados/identificadores dos clientes para o envio da notificação.")
+System_Ext(config_cat, "ConfigCat", "Serviço externo para gerenciamento de Feature Toggles.")
+
+' Relações
+Rel(cliente, app_cliente, "Utiliza")
+Rel(app_cliente, cliente, "Exibe notificação de pagamento")
+
+Rel(recebimentos, notificacao, "Fornece dados de parcelas pagas", "Replicação de BD Sybase")
+Rel(notificacao, cadastro_clientes, "Busca Hash ID do cliente", "API")
+Rel(notificacao, config_cat, "Verifica Feature Toggle", "API")
+Rel(notificacao, crm, "Solicita envio de notificação push", "API")
+
+Rel(crm, app_cliente, "Envia notificação push")
+Rel(marketing, crm, "Visualiza dashboard de disparos")
+
+@enduml

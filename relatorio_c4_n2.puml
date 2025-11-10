@@ -1,0 +1,42 @@
+@startuml C4_Container
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_WITH_LEGEND()
+
+' Sistemas Externos (do Nível 1)
+System_Ext(recebimentos, "Sistema de Recebimentos (Legado)", "Fonte dos dados de pagamento.")
+SystemDb_Ext(sybase_analitico, "Base Analítica (Sybase)", "Replicação da base transacional do legado, usada para leitura.")
+System_Ext(crm, "Building Block (CRM)", "Sistema de CRM que dispara a notificação.")
+System_Ext(cadastro_clientes, "Cadastro de Clientes", "Sistema de dados cadastrais.")
+System_Ext(config_cat, "ConfigCat", "Serviço de Feature Toggle.")
+
+' Limite do Sistema (Nível 1)
+System_Boundary(notificacao_boundary, "Sistema de Notificação de Pagamentos") {
+
+    ' Contêineres Internos
+    Container(batch_etl, "Batch ETL", "Java Spring Batch / GKE", "Processo agendado que lê pagamentos da base legada e publica eventos.")
+    Container(orquestrador, "Orquestrador de Canais", "Java Spring Boot / GKE", "Microsserviço que consome eventos, aplica regras de negócio e solicita a notificação.")
+    Container(atomico, "Serviço Atômico", "Java Spring Boot / GKE", "Microsserviço auxiliar para persistir o estado e o histórico das notificações.")
+
+    ContainerDb(mysql_db, "Banco de Dados", "MySQL / GCP Cloud SQL", "Armazena checkpoints do batch e o estado das notificações (logs, retentativas).")
+    Container(pubsub, "Mensageria (Evento)", "GCP Pub/Sub", "Fila de 'Parcelas Baixadas' que desacopla o ETL do Orquestrador.")
+
+    ' Relações Internas
+    Rel(batch_etl, mysql_db, "Verifica/Grava checkpoint", "JDBC")
+    Rel(batch_etl, pubsub, "Publica parcelas baixadas", "GCP SDK")
+
+    Rel(orquestrador, pubsub, "Consome parcelas baixadas", "GCP SDK")
+    Rel(orquestrador, atomico, "Persiste estado da notificação", "HTTPS")
+
+    Rel(atomico, mysql_db, "Grava/Atualiza notificação", "JDBC")
+}
+
+' Relações com Sistemas Externos
+Rel(batch_etl, sybase_analitico, "Consulta parcelas baixadas", "JDBC")
+Rel(recebimentos, sybase_analitico, "Replica dados", "Tempo real") ' Contexto adicional do relatório
+
+Rel(orquestrador, config_cat, "Verifica Feature Toggle (FT)", "API")
+Rel(orquestrador, cadastro_clientes, "Busca Hash ID do cliente", "API")
+Rel(orquestrador, crm, "Solicita envio de push", "API")
+
+@enduml

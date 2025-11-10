@@ -1,0 +1,40 @@
+@startuml C4_Componente_Orquestrador
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+
+' Sistemas Externos / Outros Contêineres
+System_Ext(pubsub, "Mensageria (GCP Pub/Sub)", "Fila de 'Parcelas Baixadas'")
+System_Ext(config_cat, "ConfigCat", "Serviço de Feature Toggle.")
+System_Ext(cadastro_clientes, "Cadastro de Clientes", "Fornece Hash ID do cliente.")
+System_Ext(crm, "Building Block (CRM)", "Sistema que envia o push.")
+System_Ext(atomico, "Serviço Atômico", "Microsserviço de persistência de estado.")
+
+
+' Limite do Contêiner (Nível 2)
+Container_Boundary(orquestrador_boundary, "Orquestrador de Canais [Java Spring Boot]") {
+
+    Component(consumer, "PubSubConsumer", "Spring Component", "Consome mensagens de 'Parcelas Baixadas' do GCP Pub/Sub.")
+    Component(service, "NotificationService", "Spring Service", "Componente central com a lógica de negócio para orquestrar a notificação.")
+
+    Component(ft_client, "FeatureToggleClient", "Adapter (Port)", "Cliente HTTP para verificar o estado do feature toggle no ConfigCat.")
+    Component(cadastro_client, "CadastroClienteClient", "Adapter (Port)", "Cliente HTTP para buscar o Hash ID do cliente.")
+    Component(crm_client, "CRMClient", "Adapter (Port)", "Cliente HTTP para solicitar o envio do push ao CRM.")
+    Component(atomico_client, "AtomicoClient", "Adapter (Port)", "Cliente HTTP para persistir o estado da notificação no Serviço Atômico.")
+
+    ' Relações Internas
+    Rel(consumer, service, "Chama", "Java")
+    Rel(service, ft_client, "Utiliza", "Java")
+    Rel(service, cadastro_client, "Utiliza", "Java")
+    Rel(service, crm_client, "Utiliza", "Java")
+    Rel(service, atomico_client, "Utiliza para persistir", "Java")
+}
+
+' Relações Externas
+Rel(pubsub, consumer, "Entrega mensagem", "GCP SDK")
+Rel(ft_client, config_cat, "Consulta toggle", "API/HTTPS")
+Rel(cadastro_client, cadastro_clientes, "Busca Hash ID", "API/HTTPS")
+Rel(crm_client, crm, "Solicita envio", "API/HTTPS")
+Rel(atomico_client, atomico, "Grava estado", "API/HTTPS")
+
+@enduml
